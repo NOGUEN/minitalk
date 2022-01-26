@@ -1,42 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   server.c                                           :+:      :+:    :+:   */
+/*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/01/24 21:00:26 by noguen            #+#    #+#             */
-/*   Updated: 2022/01/26 22:27:54 by noguen           ###   ########.fr       */
+/*   Created: 2022/01/26 22:14:59 by noguen            #+#    #+#             */
+/*   Updated: 2022/01/26 22:22:07 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	handler(int signo, siginfo_t *info, void *context)
+size_t	ft_strlen(const char *s)
 {
-	if (signo == SIGUSR1)
-		write(1, "1", 1);
-	else if (signo == SIGUSR2)
-		write(1, "0", 1);
+	size_t		i;
+
+	i = 0;
+	while (s[i])
+		i++;
+	return (i);
 }
 
-int	main(void)
+int	ft_atoi(const char *str)
 {
-	struct sigaction	act;
+	int		sign;
+	int		result;
 
-	act.sa_sigaction = handler;
-	act.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &act, NULL) != 0)
+	sign = 1;
+	result = 0;
+	while ((*str >= 9 && *str <= 13) || *str == 32)
+		str++;
+	if (*str == '+' || *str == '-')
 	{
-		printf("sigaction error");
-		exit(1);
+		if (*str == '-')
+			sign *= -1;
+		str++;
 	}
-	if (sigaction(SIGUSR2, &act, NULL) != 0)
-	{
-		printf("sigaction error");
-		exit(1);
-	}
-	while (1)
-		;
-	return (0);
+	while (*str >= '0' && *str <= '9')
+		result = result * 10 + (*str++ - 48);
+	return (result * sign);
 }
