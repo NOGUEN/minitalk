@@ -6,34 +6,52 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:26 by noguen            #+#    #+#             */
-/*   Updated: 2022/01/26 22:27:54 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/09 00:34:18 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	handler(int signo, siginfo_t *info, void *context)
+void	bin_to_char(int sigusr)
 {
-	if (signo == SIGUSR1)
-		write(1, "1", 1);
-	else if (signo == SIGUSR2)
-		write(1, "0", 1);
+	static char c = 0;
+	static int	i = 8;
+
+	if (sigusr == SIGUSR1)
+		c |= (0 << --i);
+	else if (sigusr == SIGUSR2)
+		c |= (1 << --i);
+	if (i == 0)
+	{
+		if (c == '\0') {
+			write(1, "\n", 1);
+		}
+		write(1, &c, 1);
+		i = 8;
+		c = 0;
+	}
 }
 
-int	main(void)
+void	handler(int sigusr)
 {
-	struct sigaction	act;
+	if (sigusr == SIGUSR1 || sigusr == SIGUSR2)
+		bin_to_char(sigusr);
+	else
+		exit(0);
+}
 
-	act.sa_sigaction = handler;
-	act.sa_flags = SA_SIGINFO;
-	if (sigaction(SIGUSR1, &act, NULL) != 0)
+int	main()
+{
+	ft_putnbr(getpid());
+	write(1, "\n", 1);
+	if (signal(SIGUSR1, handler) == SIG_ERR)
 	{
-		printf("sigaction error");
+		write(1, "Sigaction error.\n", 17);
 		exit(1);
 	}
-	if (sigaction(SIGUSR2, &act, NULL) != 0)
+	if (signal(SIGUSR2, handler) == SIG_ERR)
 	{
-		printf("sigaction error");
+		write(1, "Sigaction error.\n", 17);
 		exit(1);
 	}
 	while (1)

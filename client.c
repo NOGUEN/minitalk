@@ -6,75 +6,114 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:15 by noguen            #+#    #+#             */
-/*   Updated: 2022/01/26 22:25:52 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/09 00:34:09 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	post(int pid, int idx)
+char	*char_to_bin(int c)
 {
-	if (idx == 1)
+	int		bin[8];
+	char	*binary;
+	int		i;
+
+	i = -1;
+	while (++i < 8)
 	{
-		printf("1");
-		kill(pid, SIGUSR1);
+		if (c > 0)
+			bin[i] = c % 2;
+		else
+			bin[i] = 0;
+		c /= 2;
 	}
-	else if (idx == 0)
-	{
-		printf("0");
-		kill(pid, SIGUSR2);
-	}
-	else
-	{
-		printf("\n");
-		kill(pid, 0);
-	}
-	usleep(1000);
+	binary = malloc(sizeof(char) * 9);
+	i = -1;
+	while (++i < 8)
+		binary[i] = bin[7 - i] + 48;
+	binary[i] = '\0';
+	return (binary);
 }
 
-void	convert_n_post(int pid, int c, int num)
+void	str_to_bin(t_client *client, char *bin)
 {
-	if (!c)
+	int	i;
+
+	i = -1;
+	client->bin_msg = malloc(sizeof(char *) * (client->len + 2));
+	while (++i < client->len + 2)
+		client->bin_msg[i] = NULL;
+	i = -1;
+	while (bin[++i])
+		client->bin_msg[i] = char_to_bin((int)bin[i]);
+	client->bin_msg[i] = char_to_bin(0);
+	client->bin_msg[i + 1] = NULL;
+}
+
+void	send_sig(t_client *client, int sigusr)
+{
+	int	tmp;
+
+	if (sigusr == 1)
 	{
-		while (num != 8)
+		tmp = kill(client->pid, SIGUSR1);
+		if (tmp == -1)
 		{
-			post(pid, 0);
-			num++;
+			exit_client(client);
+			write(1, "Can't send siganl.\n", 19);
+			exit(0);
 		}
-		return ;
 	}
-	else
+	else if (sigusr == 2)
 	{
-		convert_n_post(pid, c / 2, ++num);
-		post(pid, c % 2);
+		tmp = kill(client->pid, SIGUSR2);
+		if (tmp == -1)
+		{
+			write(1, "Can't send siganl.\n", 19);
+			exit(0);
+		}
 	}
 }
 
-void	post_office(int pid, char *str)
+void	send_msg(t_client *client, char *msg)
 {
-	int	c;
-	int	num;
-	int	idx;
+	int	i;
+	int	j;
 
-	c = 0;
-	idx = -1;
-	while (str[++idx])
+	i = -1;
+	str_to_bin(client, msg);
+	while (client->bin_msg[++i])
 	{
-		num = 0;
-		c = (int)str[idx];
-		convert_n_post(pid, c, num);
-		post(pid, -1);
+		j = - 1;
+		usleep(30);
+		while (++j < 8)
+		{
+			usleep(30);
+			if (client->bin_msg[i][j] == '0')
+				send_sig(client, 1);
+			else if (client->bin_msg[i][j] == '1')
+				send_sig(client, 2);
+		}
 	}
 }
+
 
 int	main(int argc, char *argv[])
 {
+	t_client	client;
+
 	if (argc != 3)
-		return (0);
-	else
 	{
-		printf("PID : %s, Message : %s\n", argv[1], argv[2]);
-		post_office(ft_atoi(argv[1]), argv[2]);
+		write(1, "Incorrect parameters.\n", 22);
+		exit_client(&client);
 	}
-	return (0);
+	if (!ft_isnum(argv[1]))
+	{
+		write(1, "123", 3);
+		return (0);
+	}
+	client.pid = ft_atoi(argv[1]);
+	client.len = ft_strlen(argv[2]);
+	send_msg(&client, argv[2]);
+	exit_client(&client);
 }
