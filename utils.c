@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/26 22:14:59 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/09 00:23:58 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/10 17:46:20 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,22 +84,4 @@ void	ft_putnbr(int num)
 		ft_putnbr(num / 10);
 		ft_putnbr(num % 10);
 	}
-}
-
-char	*ft_strdup(const char *s)
-{
-	int	i;
-	char	*dup;
-
-	dup = malloc(sizeof(char) * (ft_strlen(s) + 1));
-	if (dup == NULL)
-		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		dup[i] = s[i];
-		i++;
-	}
-	dup[i] = '\0';
-	return dup;
 }

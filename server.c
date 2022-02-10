@@ -6,45 +6,55 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:26 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/10 01:27:41 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/10 17:51:34 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minitalk.h"
 
-void	encode(int sigusr, siginfo_t *info, void *tmp)
+void	bin_to_char(int sigusr)
 {
-	static char c = 0;
+	static char	c = 0;
 	static int	i = 8;
 
-	(void)tmp;
 	if (sigusr == SIGUSR1)
-		c += (1 << --i);
-	else if (sigusr == SIGUSR2)
 		c |= (0 << --i);
+	else if (sigusr == SIGUSR2)
+		c |= (1 << --i);
 	if (i == 0)
 	{
+		if (c == '\0')
+			write(1, "\n", 1);
 		write(1, &c, 1);
-		kill(info->si_pid, SIGUSR1);
 		i = 8;
 		c = 0;
 	}
 }
 
-int	main()
+void	handler(int sigusr)
 {
-	struct sigaction	sig;
+	if (sigusr == SIGUSR1 || sigusr == SIGUSR2)
+		bin_to_char(sigusr);
+	else
+		exit(0);
+}
 
-	sig.sa_flags = SA_SIGINFO;
-	sig.sa_sigaction = &encode;
+int	main(void)
+{
+	write(1, "PID => ", 7);
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
-
-	while (1)
+	if (signal(SIGUSR1, handler) == SIG_ERR)
 	{
-		sigaction(SIGUSR1, &sig, NULL);
-		sigaction(SIGUSR2, &sig, NULL);
-		pause();
+		write(1, "Sending error.\n", 15);
+		exit(1);
 	}
+	if (signal(SIGUSR2, handler) == SIG_ERR)
+	{
+		write(1, "Sending error.\n", 15);
+		exit(1);
+	}
+	while (1)
+		pause();
 	return (0);
 }

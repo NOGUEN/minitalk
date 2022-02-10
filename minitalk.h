@@ -6,12 +6,12 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:33 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/09 00:24:11 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/10 18:07:56 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINI_TALK_H
-# define MINI_TALK_H
+#ifndef MINITALK_H
+# define MINITALK_H
 
 # include <stdio.h>
 # include <signal.h>
@@ -32,7 +32,6 @@ int			ft_isdigit(int c);
 int			ft_isnum(char *str);
 void		ft_putnbr(int num);
 void		exit_client(t_client *client);
-char		*ft_strdup(const char *s);
+void		error_client(void);
 
-
-# endif
+#endif
