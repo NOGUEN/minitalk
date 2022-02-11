@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:15 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/10 18:11:33 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/11 15:57:10 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ void	handler(int sig)
 	if (sig == SIGUSR1)
 	{
 		write(1, "Server got message.\n", 20);
+		exit(0);
 	}
 }
 
@@ -61,6 +62,7 @@ int	main(int argc, char *argv[])
 	pid = ft_atoi(argv[1]);
 	i = -1;
 	sigaction(SIGUSR1, &sig, NULL);
+	send(pid, len);
 	while (argv[2][++i])
 		send(pid, argv[2][i]);
 	while (1)
