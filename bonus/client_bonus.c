@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:15 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/11 15:57:10 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/11 21:24:34 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,26 @@ void	handler(int sig)
 	}
 }
 
+void	send_len(int pid, int len)
+{
+	if (len >= 127)
+	{
+		while (len >= 127)
+		{
+			send(pid, 127);
+			len -= 127;
+		}
+		if (len > 0)
+			send(pid, len);
+		send(pid, 0);
+	}
+	else
+	{
+		send(pid, len);
+		send(pid, 0);
+	}
+}
+
 int	main(int argc, char *argv[])
 {
 	struct sigaction	sig;
@@ -62,7 +82,7 @@ int	main(int argc, char *argv[])
 	pid = ft_atoi(argv[1]);
 	i = -1;
 	sigaction(SIGUSR1, &sig, NULL);
-	send(pid, len);
+	send_len(pid, len);
 	while (argv[2][++i])
 		send(pid, argv[2][i]);
 	while (1)

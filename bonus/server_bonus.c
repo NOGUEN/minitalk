@@ -6,23 +6,40 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:26 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/11 16:19:05 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/11 21:23:16 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minitalk.h"
 
-/*
-void	get_size(int *i, char *c, int *cnt)
+void	convert(int *c, int *i, int sigusr)
 {
+	if (sigusr == SIGUSR1)
+		(*c) |= (1 << --(*i));
+	else if (sigusr == SIGUSR2)
+		(*c) |= (0 << --(*i));
+}
 
-}*/
+void	get_size(int *c, int *cnt, int flag)
+{
+	static int	t = 0;
 
-void	init(int *i, char *c, int *cnt, int flag)
+	if (flag == 0)
+		t += (*c);
+	else if (flag == 1)
+		(*cnt) = t;
+	else
+		t = 0;
+}
+
+void	init(int *i, int *c, int *cnt, int flag)
 {
 	if (flag == 0)
 	{
-		*cnt = *c;
+		if (*c != 0)
+			get_size(c, cnt, 0);
+		else
+			get_size(c, cnt, 1);
 		*i = 8;
 		*c = 0;
 	}
@@ -35,28 +52,28 @@ void	init(int *i, char *c, int *cnt, int flag)
 	else
 	{
 		(*cnt) = -1;
+		get_size(c, cnt, 2);
 		write(1, "\n", 1);
 	}
 }
 
 void	encode(int sigusr, siginfo_t *info, void *tmp)
 {
-	static char	c = 0;
+	static int	c = 0;
 	static int	i = 8;
 	static int	cnt = -1;
+	char		g;
 
 	(void)tmp;
-	if (sigusr == SIGUSR1)
-		c |= (1 << --i);
-	else if (sigusr == SIGUSR2)
-		c |= (0 << --i);
+	convert(&c, &i, sigusr);
 	if (i == 0)
 	{
 		if (cnt == -1)
 			init(&i, &c, &cnt, 0);
 		else
 		{
-			write(1, &c, 1);
+			g = (char)c;
+			write(1, &g, 1);
 			init(&i, &c, &cnt, 1);
 			if (cnt == 0)
 			{
@@ -78,7 +95,7 @@ int	main(void)
 	write(1, "\n", 1);
 	sigaction(SIGUSR1, &sig, NULL);
 	sigaction(SIGUSR2, &sig, NULL);
-	while(1)
+	while (1)
 		pause();
 	return (0);
 }
