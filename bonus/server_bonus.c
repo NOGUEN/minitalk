@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:26 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/10 18:02:51 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/10 21:27:51 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,9 @@ int	main(void)
 	write(1, "PID => ", 7);
 	ft_putnbr(getpid());
 	write(1, "\n", 1);
-	while (1)
-	{
-		sigaction(SIGUSR1, &sig, NULL);
-		sigaction(SIGUSR2, &sig, NULL);
+	sigaction(SIGUSR1, &sig, NULL);
+	sigaction(SIGUSR2, &sig, NULL);
+	while(1)
 		pause();
-	}
 	return (0);
 }
