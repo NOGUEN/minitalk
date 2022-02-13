@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:15 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/11 21:24:34 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/13 16:05:24 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,8 @@ int	main(int argc, char *argv[])
 		error_client();
 	sig.sa_handler = &handler;
 	if (!ft_isnum(argv[1]))
+		error_client();
+	if (ft_atoi(argv[1]) < 0)
 		error_client();
 	len = ft_strlen(argv[2]);
 	pid = ft_atoi(argv[1]);

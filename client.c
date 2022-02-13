@@ -6,7 +6,7 @@
 /*   By: noguen <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/01/24 21:00:15 by noguen            #+#    #+#             */
-/*   Updated: 2022/02/10 18:09:36 by noguen           ###   ########.fr       */
+/*   Updated: 2022/02/13 16:04:26 by noguen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ int	main(int argc, char *argv[])
 	if (argc != 3)
 		error_client();
 	if (!ft_isnum(argv[1]))
+		error_client();
+	if (ft_atoi(argv[1]) < 0)
 		error_client();
 	client.pid = ft_atoi(argv[1]);
 	client.len = ft_strlen(argv[2]);
